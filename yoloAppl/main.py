@@ -34,10 +34,7 @@ class main(QtWidgets.QMainWindow, Ui_Form):
         self.classes = []
         with open("./yolo/obj.names", "r") as f:
             self.classes = [line.strip() for line in f.readlines()]
-        # print(self.classes)
         self.layer_names = self.net.getLayerNames()
-        # print(self.net.getUnconnectedOutLayers())
-        # print(self.layer_names)
         self.output_layers = [self.layer_names[i - 1] for i in self.net.getUnconnectedOutLayers()]
         self.colors = np.random.uniform(0, 255, size=(len(self.classes), 3))
 
@@ -56,6 +53,8 @@ class main(QtWidgets.QMainWindow, Ui_Form):
         self.net.setInput(blob)
         outs = self.net.forward(self.output_layers)
 
+        # print(outs)
+
         # 정보를 화면에 표시
         class_ids = []
         confidences = []
@@ -66,6 +65,7 @@ class main(QtWidgets.QMainWindow, Ui_Form):
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
+
                 if confidence > 0.5:
                     # Object detected
                     center_x = int(detection[0] * self.width)
@@ -79,6 +79,9 @@ class main(QtWidgets.QMainWindow, Ui_Form):
                     confidences.append(float(confidence))
                     class_ids.append(class_id)
 
+                    print(self.classes[class_id])
+                    print(confidence)
+
         indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
 
         font = cv2.FONT_HERSHEY_PLAIN
@@ -89,6 +92,7 @@ class main(QtWidgets.QMainWindow, Ui_Form):
                 color = self.colors[i]
                 cv2.rectangle(self.img, (x, y), (x + w, y + h), color, 2)
                 cv2.putText(self.img, label, (x, y + 30), font, 3, color, 3)
+                # print(label)
         cv2.imshow("output", self.img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
