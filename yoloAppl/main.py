@@ -1,10 +1,32 @@
+import sys
 import cv2
 import numpy as np
 
-class main():
+from PyQt5 import QtCore, QtGui, QtWidgets, uic
+
+Ui_Form = uic.loadUiType("./main.ui")[0]
+
+
+class main(QtWidgets.QMainWindow, Ui_Form):
 
     def __init__(self):
         super().__init__()
+        self.setupUi(self)
+        self.initUi()
+
+    def initUi(self):
+        # self.setGeometry(800, 200, 300, 300)
+        self.setWindowTitle('demo')
+        self.pushButton.clicked.connect(self.fileOpen)
+
+    def fileOpen(self):
+        global filename
+        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File')
+
+        if ".jpg" in filename[0]:
+            self.loadYolo(filename[0])
+
+    def loadYolo(self, filename):
 
         # Yolo 로드
         self.net = cv2.dnn.readNet("./yolo/test_best.weights", "./yolo/test.cfg")
@@ -12,15 +34,15 @@ class main():
         self.classes = []
         with open("./yolo/obj.names", "r") as f:
             self.classes = [line.strip() for line in f.readlines()]
-        #print(self.classes)
+        # print(self.classes)
         self.layer_names = self.net.getLayerNames()
         # print(self.net.getUnconnectedOutLayers())
         # print(self.layer_names)
         self.output_layers = [self.layer_names[i - 1] for i in self.net.getUnconnectedOutLayers()]
         self.colors = np.random.uniform(0, 255, size=(len(self.classes), 3))
 
-        #이미지 가져오기
-        self.img = cv2.imread("./images/LFSDM_20210812093117461_001101001_pic206_004001.jpg")
+        # 이미지 가져오기
+        self.img = cv2.imread(filename)
         self.img = cv2.resize(self.img, None, fx=0.4, fy=0.4)
         self.height, self.width, self.channels = self.img.shape
         print(self.height, self.width, self.channels)
@@ -71,5 +93,9 @@ class main():
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
+
 if __name__ == '__main__':
-     main()
+    app = QtWidgets.QApplication(sys.argv)
+    main = main()
+    main.show()
+    app.exec_()
