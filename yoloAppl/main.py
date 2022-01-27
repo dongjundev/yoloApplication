@@ -23,7 +23,7 @@ class main(QtWidgets.QMainWindow, Ui_Form):
         global filename
         filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File')
 
-        if ".jpg" in filename[0]:
+        if ".jpg" in filename[0] or ".png" in filename[0]:
             self.loadYolo(filename[0])
 
     def loadYolo(self, filename):
