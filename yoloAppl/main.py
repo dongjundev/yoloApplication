@@ -44,9 +44,9 @@ class main(QtWidgets.QMainWindow, Ui_Form):
         self.height, self.width, self.channels = self.img.shape
         print(self.height, self.width, self.channels)
 
-        self.detectImage()
+        self.detectImage(filename)
 
-    def detectImage(self):
+    def detectImage(self, filename):
 
         # Detecting objects
         blob = cv2.dnn.blobFromImage(self.img, 0.00392, (416, 416), (0, 0, 0), True, crop=False)
@@ -94,6 +94,8 @@ class main(QtWidgets.QMainWindow, Ui_Form):
                 cv2.putText(self.img, label, (x, y + 30), font, 3, color, 3)
                 # print(label)
         cv2.imshow("output", self.img)
+        tail = filename[-4:]
+        cv2.imwrite(filename[:len(filename)-4]+"_out_"+tail, self.img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
